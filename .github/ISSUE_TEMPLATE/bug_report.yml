@@ -1,0 +1,38 @@
+name: Bug report
+description: Report a reproducible installer, hook, or skill-behavior problem using fictional inputs.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Never include private prompts, credentials, or proprietary evidence.
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Include the expected behavior and actual behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: Use a fictional prompt and include hook or skill output when relevant.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Claude Code version, Python version, operating system, and installation method.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and Discussions.
+          required: true
+        - label: I removed private and identifying information from this report.
+          required: true

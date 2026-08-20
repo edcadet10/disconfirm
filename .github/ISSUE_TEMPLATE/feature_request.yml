@@ -1,0 +1,49 @@
+name: Feature request
+description: Propose a focused improvement to the method, hook, installation, or documentation.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What decision-quality or contributor need is not met today?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Proposed outcome
+      description: Describe observable behavior using fictional examples.
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Primary surface
+      options:
+        - Claim or kill-criterion framing
+        - Grounded research
+        - Cheapest falsifying test
+        - Result reporting
+        - Hook trigger precision
+        - Installer portability
+        - Documentation or examples
+    validations:
+      required: true
+  - type: textarea
+    id: falsifier
+    attributes:
+      label: Cheapest falsifying example
+      description: What small observation would show that this proposal is wrong or harmful?
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and Discussions.
+          required: true
+        - label: The proposal keeps the method right-sized and preserves fail-open hook behavior.
+          required: true

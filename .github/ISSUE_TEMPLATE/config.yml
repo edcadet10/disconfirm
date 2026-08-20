@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Design question or open-ended idea
+    url: https://github.com/edcadet10/disconfirm/discussions
+    about: Start a Discussion before changing the core method or hook trigger policy.
+  - name: Security vulnerability
+    url: https://github.com/edcadet10/disconfirm/security/advisories/new
+    about: Report vulnerabilities privately; do not open a public issue.

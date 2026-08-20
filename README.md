@@ -3,10 +3,12 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/edcadet10/disconfirm/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/edcadet10/disconfirm/ci.yml?branch=main&amp;style=flat-square&amp;label=CI" alt="CI status"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4ecca3?style=flat-square" alt="MIT license"></a>
-  <a href="https://docs.claude.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude%20Code-skill-7c5cff?style=flat-square&logo=anthropic&logoColor=white" alt="Claude Code skill"></a>
+  <a href="https://code.claude.com/docs/en/skills"><img src="https://img.shields.io/badge/Claude%20Code-skill-7c5cff?style=flat-square&logo=anthropic&logoColor=white" alt="Claude Code skill"></a>
   <a href="hooks/disconfirm-nudge.py"><img src="https://img.shields.io/badge/auto--invoked-UserPromptSubmit%20hook-5eead4?style=flat-square" alt="Auto-invoked via hook"></a>
   <img src="https://img.shields.io/badge/red--team-your%20own%20belief-0b0e14?style=flat-square" alt="Red-team your own belief">
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributions-welcome-22d3ee?style=flat-square" alt="Contributions welcome"></a>
 </p>
 
 <p align="center"><b>Make Claude try to break its own conclusion before it hands you one.</b></p>
@@ -109,6 +111,10 @@ That back-and-forth is the entire point. It didn't tell me what I wanted to hear
 - A fact you can just look up. Look it up. That's research, not calibration.
 - A trivial, easily-reversible choice where being wrong costs nothing.
 - Pure execution with no contested claim in it.
+
+## contribute
+
+Contributions are welcome. Read the [guide](CONTRIBUTING.md), open an [issue](https://github.com/edcadet10/disconfirm/issues/new/choose), or discuss broad changes in [Discussions](https://github.com/edcadet10/disconfirm/discussions). Run `./scripts/check.sh` before opening a PR.
 
 ## part of my arsenal
 
