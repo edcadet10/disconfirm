@@ -62,22 +62,91 @@ def run_hook(raw_input: str) -> subprocess.CompletedProcess[str]:
         check=False,
     )
 
-triggered = run_hook(json.dumps({"prompt": "Compare two frameworks and tell me which we should use."}))
-assert triggered.returncode == 0 and not triggered.stderr
-payload = json.loads(triggered.stdout)
-context = payload["hookSpecificOutput"]["additionalContext"]
-assert payload["hookSpecificOutput"]["hookEventName"] == "UserPromptSubmit"
-assert "disconfirm" in context and "FALSIFY" in context
+positive_prompts = [
+    "Compare SQLite and Postgres for this write-heavy API; tell us which to adopt.",
+    "Which framework should we use for the API?",
+    "I think this cache fix works; validate it before rollout.",
+    "What is the root cause of the latency spike?",
+    "Is parser A faster than parser B on large files?",
+    "Is this authentication design secure enough to ship?",
+    "Does this retry strategy generalize across regions?",
+    "Evaluate whether switching to Rust is worth it.",
+    "Review whether this architecture can scale to 10k RPS.",
+    "I suspect the new index is faster under production load.",
+]
+negative_prompts = [
+    "Fix the typo in README.md.",
+    "Look up the current Python release version.",
+    "Research where UserService is defined in this repository.",
+    "Prove that the square root of 2 is irrational.",
+    "I will probably rename this variable.",
+    "Compare these two strings for equality in Python.",
+    "Run the benchmark script and paste its raw output.",
+    "Evaluate 2 + 2.",
+    "Which file contains the route?",
+    "Validate this JSON against the schema and return the errors.",
+]
+variant_positive_prompts = [
+    "Before rollout, test whether the new sanitizer is actually safe.",
+    "Are we confident this migration is correct?",
+    "Would DynamoDB be a better choice than Postgres here?",
+    "Which design is most reliable under partial failure?",
+    "The new queue should be cheaper than SQS; check that claim.",
+    "Can this service handle 50,000 concurrent users?",
+    "Will this fix hold under retries?",
+    "I believe the memory leak comes from the cache.",
+    "Validate the claim that compression improves throughput.",
+    "We need a recommendation between gRPC and REST for mobile clients.",
+]
+variant_negative_prompts = [
+    "Research the declaration of parseConfig.",
+    "Compare x and y and return a boolean.",
+    "Prove Lemma 4 by induction.",
+    "Validate config.yaml against config.schema.json.",
+    "Run the benchmark named latency and paste the output.",
+    "Review README.md for spelling errors.",
+    "Test the login endpoint and paste the status code.",
+    "I think I left my notes in docs/.",
+    "Which model file defines User?",
+    "Calculate whether 17 is faster to type than seventeen.",
+]
 
-for raw_input in (
-    json.dumps({"prompt": "Fix the typo in README.md."}),
-    json.dumps({"prompt": ""}),
-    "not-json",
-):
+def hook_triggered(prompt: str) -> bool:
+    result = run_hook(json.dumps({"prompt": prompt}))
+    assert result.returncode == 0 and not result.stderr
+    if not result.stdout:
+        return False
+    payload = json.loads(result.stdout)
+    context = payload["hookSpecificOutput"]["additionalContext"]
+    assert payload["hookSpecificOutput"]["hookEventName"] == "UserPromptSubmit"
+    assert "disconfirm" in context and "FALSIFY" in context
+    return True
+
+true_positives = sum(hook_triggered(prompt) for prompt in positive_prompts)
+false_positives = sum(hook_triggered(prompt) for prompt in negative_prompts)
+assert true_positives >= 8, f"hook recall too low: {true_positives}/10"
+assert false_positives <= 2, f"hook false-positive rate too high: {false_positives}/10"
+variant_true_positives = sum(hook_triggered(prompt) for prompt in variant_positive_prompts)
+variant_false_positives = sum(hook_triggered(prompt) for prompt in variant_negative_prompts)
+assert variant_true_positives >= 8, (
+    f"hook variant recall too low: {variant_true_positives}/10"
+)
+assert variant_false_positives <= 2, (
+    f"hook variant false-positive rate too high: {variant_false_positives}/10"
+)
+assert hook_triggered("Prove that the new algorithm is correct before deployment.")
+
+for raw_input in (json.dumps({"prompt": ""}), "not-json"):
     result = run_hook(raw_input)
     assert result.returncode == 0 and result.stdout == "" and result.stderr == ""
 
-print(f"skill metadata, hook behavior, SVG, JSON, and {len(documents)} documents validated")
+print(
+    f"skill metadata, hook behavior ({true_positives}/10 positive, "
+    f"{false_positives}/10 false positive; variants "
+    f"{variant_true_positives}/10 positive, "
+    f"{variant_false_positives}/10 false positive), SVG, JSON, and "
+    f"{len(documents)} documents validated"
+)
 PY
 
 for DISCONFIRM_RUN in 1 2; do

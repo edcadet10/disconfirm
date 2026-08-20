@@ -19,23 +19,61 @@ except Exception:
 
 prompt = str(data.get("prompt") or "")
 
-# Targeted at language that signals a contested empirical/design claim or a
-# decision-driving comparison — the cases where an untested conclusion is risky.
-TRIGGER = re.compile(
-    r"\b("
-    r"research|compare|comparison|benchmark|evaluat\w+|validat\w+|calibrat\w+|"
-    r"better than|best (?:way|approach|option|choice|method|model)|"
-    r"which (?:approach|option|model|library|framework|tool|design|method|way)|"
-    r"should (?:we|i) (?:use|pick|choose|adopt)|is it worth|worth it|"
-    r"root cause|hypothesis|assumption|prove|disprove|"
-    r"i (?:think|believe|assume|bet|suspect|reckon)|probably|"
-    r"i'?m (?:fairly |pretty )?(?:sure|confident)|"
-    r"does (?:it|this|that) (?:work|hold|generalize)"
+# A strong claim signal can trigger alone. Generic work verbs only trigger when
+# paired with decision language, which avoids interrupting lookups, arithmetic,
+# schema validation, and other pure execution.
+CLAIM_SIGNAL = re.compile(
+    r"(?:"
+    r"\b(?:better|faster|slower|safer|cheaper|more reliable|less reliable)"
+    r"(?:\s+[\w-]+){0,3}\s+than\b|"
+    r"\bbest (?:way|approach|option|choice|method|model)\b|"
+    r"\bwhich (?:approach|option|model|library|framework|tool|design|method|way)"
+    r"\s+(?:should|is|would)\b|"
+    r"\bshould (?:we|i) (?:use|pick|choose|adopt)\b|"
+    r"\bis (?:it|this|that) worth\b|\bworth it\b|"
+    r"\broot cause\b|\bhypothesis\b|\bassumption\b|"
+    r"\b(?:comes?|stems?|results?)\s+from\b|"
+    r"\brecommend(?:ation)?\s+between\b|"
+    r"\b(?:does|will)\s+(?:it|this|that)\b(?:\s+[\w-]+){0,5}\s+"
+    r"(?:work|hold|generalize)\b|"
+    r"\bis\s+(?:it|this|that)\b(?:\s+[\w-]+){0,5}\s+"
+    r"(?:safe|secure|correct|scalable|reliable|ready)\b|"
+    r"\b(?:it|this|that)\b(?:\s+[\w-]+){0,5}\s+can\s+(?:scale|handle)\b|"
+    r"\b(?:can|will)\s+(?:it|this|that)\b(?:\s+[\w-]+){0,5}\s+"
+    r"(?:scale|handle)\b"
+    r")",
+    re.IGNORECASE,
+)
+
+CONFIDENCE_SIGNAL = re.compile(
+    r"\b(?:"
+    r"i (?:think|believe|assume|bet|suspect|reckon)|"
+    r"(?:i(?:'m| am)|we(?:'re| are)|are we|am i)"
+    r"(?:\s+(?:fairly|pretty))?\s+(?:sure|confident)"
     r")\b",
     re.IGNORECASE,
 )
 
-if TRIGGER.search(prompt):
+DECISION_ACTION = re.compile(
+    r"\b(?:research|compar\w*|benchmark\w*|evaluat\w+|validat\w+|"
+    r"calibrat\w+|review\w*|test\w*|prove|disprove)\b",
+    re.IGNORECASE,
+)
+DECISION_CONTEXT = re.compile(
+    r"\b(?:claim|hypothesis|assumption|decision|recommend\w*|choose|adopt|"
+    r"ship|rollout|production|worth|better|faster|safe|safer|security|secure|"
+    r"correct|works?|root cause|approach|option|library|framework|"
+    r"architecture|design)\b",
+    re.IGNORECASE,
+)
+
+should_trigger = bool(
+    CLAIM_SIGNAL.search(prompt)
+    or (CONFIDENCE_SIGNAL.search(prompt) and DECISION_CONTEXT.search(prompt))
+    or (DECISION_ACTION.search(prompt) and DECISION_CONTEXT.search(prompt))
+)
+
+if should_trigger:
     msg = (
         "DISCONFIRM-CHECK (auto-injected): this reads as a research / "
         "assumption-validation / comparison task. Before asserting any conclusion "
